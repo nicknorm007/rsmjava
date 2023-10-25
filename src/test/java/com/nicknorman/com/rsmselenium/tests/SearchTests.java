@@ -1,4 +1,4 @@
-package com.nicknorman.com;
+package com.nicknorman.com.rsmselenium.tests;
 
 import com.nicknorman.com.rsmselenium.pages.HomePage;
 import org.junit.AfterClass;
