@@ -10,11 +10,7 @@ import java.util.List;
 public class App 
 {
     public static void main( String[] args )
-    {
-        App myApp = new App();
-        String inputStr = "1,1,3,3,5,5,45,45";
-        myApp.fooBarRsm(inputStr);
-    }
+    {}
     String fooBarRsm(String str)
     {
         List<String> used = new ArrayList<String>();
@@ -38,7 +34,6 @@ public class App
             }
 
         }
-        System.out.println(builder.toString());
         return builder.toString();
     }
     String getFooBar(int number) {
