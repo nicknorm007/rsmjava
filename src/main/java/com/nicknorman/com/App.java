@@ -11,7 +11,7 @@ public class App
 {
     public static void main( String[] args )
     {}
-    String fooBarRsm(String str)
+    String FooBar(String str)
     {
         List<String> used = new ArrayList<String>();
         String[] myList = str.split(",");
