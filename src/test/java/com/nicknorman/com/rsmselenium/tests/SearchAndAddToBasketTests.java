@@ -15,6 +15,7 @@ public class SearchAndAddToBasketTests {
     HomePage home;
 
     private static String title;
+    private static String targetPrice;
     private static Set<String> acceptablePaperbackMatches;
     private static List<String> searchTitles;
     private static List<String> sections;
@@ -43,6 +44,7 @@ public class SearchAndAddToBasketTests {
 
         linkPaperBack = home.getPaperbackLinkFromFirstItem();
         paperBackLinksWithTitles = home.getPaperbackLinksWithTitlesByTitleSearch(title);
+        targetPrice = home.getPriceOfFirstPaperbackEditionByTitle(title, sections);
     }
     @AfterClass
     public static void tearDown() {
@@ -114,6 +116,9 @@ public class SearchAndAddToBasketTests {
 
         //assert prices match
         Assert.assertTrue(basket_price.equals(price));
+
+        //assert price from search results matches
+        Assert.assertTrue(basket_price.equals(targetPrice));
 
         //assert only one item in basket
         Assert.assertTrue(home.getNumberOfItemsInCart() == 1);

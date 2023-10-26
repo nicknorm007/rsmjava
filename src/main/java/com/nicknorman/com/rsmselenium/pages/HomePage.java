@@ -7,10 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HomePage {
 
@@ -139,6 +136,27 @@ public class HomePage {
 
         return paperBackLink;
 
+    }
+    public String getPriceOfFirstPaperbackEditionByTitle(String title, List<String> sections){
+
+        String priceStr;
+
+        for(String str : sections)
+        {
+            String[] lineItems = str.split("\\r?\\n");
+            for(int i=0;i<lineItems.length;i++)
+            {
+                if(lineItems[i].equals("Paperback") )
+                {
+                    if(lineItems[i+1].matches(".*£\\d+.*"))
+                    {
+                        priceStr = lineItems[i+1] + "." + lineItems[i+2];
+                        return priceStr;
+                    }
+                }
+            }
+        }
+        return "";
     }
     public Map<String, WebElement> getPaperbackLinksWithTitlesByTitleSearch(String titleStr) {
 
