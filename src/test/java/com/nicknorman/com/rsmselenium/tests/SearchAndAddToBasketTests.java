@@ -36,6 +36,7 @@ public class SearchAndAddToBasketTests {
     public void setupPageSearch() throws InterruptedException {
         home = new HomePage(driver);
         home.goToPage();
+        home.clickAcceptCookies();
         home.searchForItem(title);
         searchTitles = home.getSearchTitles();
         sections = home.getSearchSections();
@@ -77,30 +78,59 @@ public class SearchAndAddToBasketTests {
 
     }
     @Test
-    public void testPaperbackContainsSamePriceAndTitle(){
-
-
-
-
-
-    }
-    @Test
-    public void testTitleContainsPaperbackEdition() {
+    public void testAddToBasketWithPaperbackEdition() throws InterruptedException {
 
         boolean foundPaperBackEdition = false;
+        String price = "";
 
         for (Map.Entry<String,WebElement> entry : paperBackLinksWithTitles.entrySet())
         {
             WebElement ele = entry.getValue();
-            String link = ele.getAttribute("href");
-            driver.get(link);
-            home.clickAcceptCookies();
+            Thread.sleep(2000); //for site issues and testing purposes
+            ele.click();
             foundPaperBackEdition = home.isAddToBasketBtnPresent();
             if(foundPaperBackEdition){
+                List<WebElement> eles = home.findBasketPrices();
+                price = eles.get(1).getText().split("\\r?\\n")[1];
+                Assert.assertTrue(eles.get(1).getText().split("\\r?\\n")[0].equals("Paperback"));
+                home.clickGiftWrapCheckbox();
+                home.clickAddToBasketBtn();
                 break;
+            }
+            else
+            {
+                home.goToPage();
+                home.searchForItem(title);
             }
         }
         Assert.assertTrue(foundPaperBackEdition);
+        home.clickGoToBasketBtn();
+        home.waitForGiftCheckbox();
 
+        //assert gift box is selected
+        Assert.assertTrue(home.isGiftCheckBoxSelected());
+
+        String basket_price = home.getBasketPrice();
+
+        //assert prices match
+        Assert.assertTrue(basket_price.equals(price));
+
+        //assert only one item in basket
+        Assert.assertTrue(home.getNumberOfItemsInCart() == 1);
+
+        //assert title in basket is correct
+        List<WebElement> titlesIn = home.getTitlesInBasket();
+
+        boolean found=false;
+        for(WebElement ele : titlesIn)
+        {
+            found = ele.getText().contains(title) ? true : false;
+            if(found){
+                break;
+            }
+
+        }
+        //we found the title inside the go to basket section
+        Assert.assertTrue(found);
     }
 }

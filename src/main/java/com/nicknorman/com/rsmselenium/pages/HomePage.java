@@ -4,7 +4,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -12,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.time.Duration.*;
 
 public class HomePage {
 
@@ -27,6 +24,13 @@ public class HomePage {
     By sectionResults = By.cssSelector("div[data-component-type=s-search-result]");
     By addToBasketBtn = By.id("add-to-cart-button");
     By acceptCookies = By.id("sp-cc-accept");
+    By basketPricesList = By.cssSelector("#tmmSwatches li");
+    By giftOptionCheckBox = By.id("gift-wrap");
+    By goToBasket = By.partialLinkText("Go to basket");
+    By orderContainsGiftCheckbox = By.id("sc-buy-box-gift-checkbox");
+    By basketPrice = By.className("sc-item-price-block-badge");
+    By cartItems = By.cssSelector("div[data-asin]");
+    By titleInBasket = By.cssSelector("span.a-list-item");
 
     public HomePage(WebDriver driver) {
         this.driver=driver;
@@ -45,8 +49,43 @@ public class HomePage {
             driver.findElement(acceptCookies).click();
         }
     }
+    public String getBasketPrice()
+    {
+       return driver.findElement(basketPrice).getText();
+
+    }
+    public List<WebElement> getTitlesInBasket()
+    {
+        List<WebElement> eles = driver.findElements(titleInBasket);
+        return eles;
+    }
+    public Integer getNumberOfItemsInCart()
+    {
+        return driver.findElements(cartItems).size();
+
+    }
+    public void clickGiftWrapCheckbox() {
+        driver.findElement(giftOptionCheckBox).click();
+    }
+    public void waitForGiftCheckbox() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(orderContainsGiftCheckbox));
+    }
+    public void clickGoToBasketBtn() {
+        driver.findElement(goToBasket).click();
+    }
+    public boolean isGiftCheckBoxSelected()
+    {
+        return driver.findElement(orderContainsGiftCheckbox).isSelected();
+
+    }
+    public List<WebElement> findBasketPrices()
+    {
+        return driver.findElements(basketPricesList);
+
+    }
     public boolean isAddToBasketBtnPresent() {
-        return driver.findElements(addToBasketBtn).isEmpty();
+        return !driver.findElements(addToBasketBtn).isEmpty();
     }
     public void clickAddToBasketBtn() {
         driver.findElement(addToBasketBtn).click();
