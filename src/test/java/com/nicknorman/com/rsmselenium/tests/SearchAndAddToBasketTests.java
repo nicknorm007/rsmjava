@@ -34,10 +34,11 @@ public class SearchAndAddToBasketTests {
 
     }
     @Before
-    public void setupPageSearch() throws InterruptedException {
+    public void setupPageSearch() {
         home = new HomePage(driver);
         home.goToPage();
         home.clickAcceptCookies();
+        home.gotoBooksDepartment();
         home.searchForItem(title);
         searchTitles = home.getSearchTitles();
         sections = home.getSearchSections();
