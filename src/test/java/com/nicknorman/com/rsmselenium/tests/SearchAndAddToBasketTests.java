@@ -15,6 +15,7 @@ public class SearchAndAddToBasketTests {
     HomePage home;
 
     private static String title;
+    private static String searchTitle;
     private static String targetPrice;
     private static Set<String> acceptablePaperbackMatches;
     private static List<String> searchTitles;
@@ -27,6 +28,7 @@ public class SearchAndAddToBasketTests {
         driver = new ChromeDriver();
 
         title = "Harry Potter and the Cursed Child";
+        searchTitle = "Harry Potter and the Cursed Child Parts 1 and 2";
         acceptablePaperbackMatches = new HashSet<String>(){{
             add("Paperback");
             add("Mass Market Paperback");
@@ -39,13 +41,13 @@ public class SearchAndAddToBasketTests {
         home.goToPage();
         home.clickAcceptCookies();
         home.gotoBooksDepartment();
-        home.searchForItem(title);
+        home.searchForItem(searchTitle);
         searchTitles = home.getSearchTitles();
         sections = home.getSearchSections();
 
         linkPaperBack = home.getPaperbackLinkFromFirstItem();
         paperBackLinksWithTitles = home.getPaperbackLinksWithTitlesByTitleSearch(title);
-        targetPrice = home.getPriceOfFirstPaperbackEditionByTitle(title, sections);
+        targetPrice = home.getPriceOfFirstPaperbackEdition(sections);
     }
     @AfterClass
     public static void tearDown() {
@@ -83,30 +85,16 @@ public class SearchAndAddToBasketTests {
     @Test
     public void testAddToBasketWithPaperbackEdition() throws InterruptedException {
 
-        boolean foundPaperBackEdition = false;
         String price = "";
 
-        for (Map.Entry<String,WebElement> entry : paperBackLinksWithTitles.entrySet())
-        {
-            WebElement ele = entry.getValue();
-            Thread.sleep(2000); //for site issues and testing purposes
-            ele.click();
-            foundPaperBackEdition = home.isAddToBasketBtnPresent();
-            if(foundPaperBackEdition){
-                List<WebElement> eles = home.findBasketPrices();
-                price = eles.get(1).getText().split("\\r?\\n")[1];
-                Assert.assertTrue(eles.get(1).getText().split("\\r?\\n")[0].equals("Paperback"));
-                home.clickGiftWrapCheckbox();
-                home.clickAddToBasketBtn();
-                break;
-            }
-            else
-            {
-                home.goToPage();
-                home.searchForItem(title);
-            }
-        }
-        Assert.assertTrue(foundPaperBackEdition);
+        WebElement elem = home.getPaperbackLinkFromFirstEligibleItem();
+        elem.click();
+
+        List<WebElement> eles = home.findBasketPrices();
+        price = eles.get(1).getText().split("\\r?\\n")[1];
+        Assert.assertTrue(eles.get(1).getText().split("\\r?\\n")[0].equals("Paperback"));
+        home.clickGiftWrapCheckbox();
+        home.clickAddToBasketBtn();
         home.clickGoToBasketBtn();
         home.waitForGiftCheckbox();
 

@@ -143,7 +143,34 @@ public class HomePage {
         return paperBackLink;
 
     }
-    public String getPriceOfFirstPaperbackEditionByTitle(String title, List<String> sections){
+    public WebElement getPaperbackLinkFromFirstEligibleItem() {
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(backToTopLabel));
+
+        List<WebElement> results = driver.findElements(sectionResults);
+
+        for(WebElement ele : results)
+        {
+            String[] lineItems = ele.getText().split("\\r?\\n");
+
+            for(int i=0;i<lineItems.length;i++)
+            {
+                if(lineItems[i].equals("Paperback") )
+                {
+                    if(lineItems[i+1].matches(".*£\\d+.*"))
+                    {
+                        return ele.findElement(By.linkText("Paperback"));
+                    }
+                }
+            }
+
+        }
+
+        return null;
+
+    }
+    public String getPriceOfFirstPaperbackEdition(List<String> sections){
 
         String priceStr;
 
