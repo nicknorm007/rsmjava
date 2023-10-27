@@ -16,11 +16,11 @@ public class RsmUploadDownloadService {
     }
 
     public void downloadFromOneAndUploadToAnother(long packageId) {
-        List<DownloadInfo> downloadInfos = downloadService.getDownloadInfos(packageId);
+        List<DownloadInfo> downloadInfoItem = downloadService.getDownloadInfos(packageId);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(downloadInfos.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(downloadInfoItem.size());
 
-        for (DownloadInfo downloadInfo : downloadInfos) {
+        for (DownloadInfo downloadInfo : downloadInfoItem) {
             executorService.execute(() -> {
                 try {
                     downloadAndUpload(downloadInfo);
@@ -80,7 +80,6 @@ public class RsmUploadDownloadService {
         try {
             dataTransferService.downloadFromOneAndUploadToAnother(packageId);
         } catch (Exception e) {
-            // Handle exceptions here
             e.printStackTrace();
         }
     }
