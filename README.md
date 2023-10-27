@@ -1,7 +1,7 @@
 # rsmjava
 
 1. FooBar problem in App.java, AppTest
-2. Selenium in rsmselenium.tests
+2. Selenium in rsmselenium.tests - need chromedriver 118 in path
 3. Threaded attempt in....
 
 
