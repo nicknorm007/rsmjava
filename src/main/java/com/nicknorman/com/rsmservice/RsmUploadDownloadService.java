@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+//I attempted to sketch out code for the multi-threaded test task and implement the methods asked for and generate
+// some sample structure.  I was not familiar enough with developing java multithreaded code to accurately complete this
+// but wanted to give it an attempt and take it as far as I could.
+
 public class RsmUploadDownloadService {
     private DownloadService downloadService;
     private UploadService uploadService;
@@ -20,6 +24,7 @@ public class RsmUploadDownloadService {
         List<DownloadInfo> downloadInfoItems = downloadService.getDownloadInfos(packageId);
 
         ExecutorService executorService = Executors.newFixedThreadPool(downloadInfoItems.size());
+        //is every upload and download its own thread? maybe need a list of threads??
         List<Thread> uploadsAndDownloads = new ArrayList<>();
         List<ReportData> data = new ArrayList<>();
 
@@ -41,9 +46,9 @@ public class RsmUploadDownloadService {
             thread.start();
         }
 
-        for (Thread thread : uploadsAndDownloads) {
+        for (Thread t : uploadsAndDownloads) {
             try {
-                thread.join();
+                t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -52,34 +57,6 @@ public class RsmUploadDownloadService {
         executorService.shutdown();
     }
 
-    private synchronized void downloadAndUpload(DownloadInfo downloadInfo) throws Exception {
-        String fileKey = downloadInfo.getFileKey();
-        int size = downloadInfo.getSize();
-
-        List<ReportData> reportEntries = new ArrayList<>();
-        int totalSuccesses = 0;
-        int totalFailures = 0;
-        long startTime = System.currentTimeMillis();
-
-        if (size > MAX_DOWNLOAD_MB) {
-            throw new Exception();
-        }
-
-        String fileName = downloadInfo.getOriginalFileName();
-        String fileExtension = getFileExtension(fileName);
-
-        if (fileExtensionIsNotAllowed(fileExtension)) {
-            throw new IllegalArgumentException("File extension not allowed.");
-        }
-
-        InputStream dataStream = downloadService.downloadFile(downloadInfo.getDownloadURL());
-
-        try {
-            uploadService.doUpload(fileKey, dataStream, size);
-        } finally {
-            dataStream.close();
-        }
-    }
 
     private String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
@@ -98,11 +75,11 @@ public class RsmUploadDownloadService {
         DownloadService downloadService = new DownloadServiceImpl();
         UploadService uploadService = new UploadServiceImpl();
 
-        RsmUploadDownloadService dataTransferService = new RsmUploadDownloadService(downloadService, uploadService);
+        RsmUploadDownloadService rsmDownloadService = new RsmUploadDownloadService(downloadService, uploadService);
 
         long packageId = 11111;
         try {
-            dataTransferService.downloadFromOneAndUploadToAnother(packageId);
+            rsmDownloadService.downloadFromOneAndUploadToAnother(packageId);
         } catch (Exception e) {
             e.printStackTrace();
         }
