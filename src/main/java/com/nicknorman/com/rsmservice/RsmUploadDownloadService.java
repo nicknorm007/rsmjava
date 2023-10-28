@@ -1,6 +1,7 @@
 package com.nicknorman.com.rsmservice;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,7 +9,7 @@ import java.util.concurrent.Executors;
 public class RsmUploadDownloadService {
     private DownloadService downloadService;
     private UploadService uploadService;
-    private static final int MAX_DOWNLOAD_MB = 1024 * 100; // 100MB?
+    private static final int MAX_DOWNLOAD_MB = 1024 * 1000; // 100MB?
 
     public RsmUploadDownloadService(DownloadService downloadService, UploadService uploadService) {
         this.downloadService = downloadService;
@@ -16,18 +17,36 @@ public class RsmUploadDownloadService {
     }
 
     public void downloadFromOneAndUploadToAnother(long packageId) {
-        List<DownloadInfo> downloadInfoItem = downloadService.getDownloadInfos(packageId);
+        List<DownloadInfo> downloadInfoItems = downloadService.getDownloadInfos(packageId);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(downloadInfoItem.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(downloadInfoItems.size());
+        List<Thread> uploadsAndDownloads = new ArrayList<>();
+        List<ReportData> data = new ArrayList<>();
 
-        for (DownloadInfo downloadInfo : downloadInfoItem) {
-            executorService.execute(() -> {
+        for (DownloadInfo entry : downloadInfoItems) {
+            uploadsAndDownloads.add(new Thread(() -> {
                 try {
-                    downloadAndUpload(downloadInfo);
+                    long start = System.currentTimeMillis();
+                    uploadService.doUpload(entry.getFileKey(),
+                            entry.downloadFile(entry.getOriginalFileName()), entry.getSize());
+                    long end = System.currentTimeMillis();
+                    data.add(new ReportData(entry));
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            });
+            }));
+        }
+
+        // was unsure here - maybe start a thread then wait for the other to complete first?
+        for (Thread thread : uploadsAndDownloads) {
+            thread.start();
+        }
+
+        for (Thread thread : uploadsAndDownloads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         executorService.shutdown();
@@ -36,6 +55,11 @@ public class RsmUploadDownloadService {
     private synchronized void downloadAndUpload(DownloadInfo downloadInfo) throws Exception {
         String fileKey = downloadInfo.getFileKey();
         int size = downloadInfo.getSize();
+
+        List<ReportData> reportEntries = new ArrayList<>();
+        int totalSuccesses = 0;
+        int totalFailures = 0;
+        long startTime = System.currentTimeMillis();
 
         if (size > MAX_DOWNLOAD_MB) {
             throw new Exception();

@@ -26,7 +26,7 @@ public class HomePage {
     By giftOptionCheckBox = By.id("gift-wrap");
     By goToBasket = By.partialLinkText("Go to basket");
     By orderContainsGiftCheckbox = By.id("sc-buy-box-gift-checkbox");
-    By basketPrice = By.className("sc-item-price-block-badge");
+    By basketPrice = By.cssSelector("div[data-name=Subtotals]");
     By cartItems = By.cssSelector("div[data-asin]");
     By titleInBasket = By.cssSelector("span.a-list-item");
 

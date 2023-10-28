@@ -59,6 +59,11 @@ public class SearchAndAddToBasketTests {
         Assert.assertTrue(searchTitles.get(0).contains(title));
     }
     @Test
+    public void testFirstSearchResultMatchesSearch()  {
+        Assert.assertTrue(searchTitles.get(0).toLowerCase()
+                .matches("harry potter and the cursed child.*parts (1|one) (and|&) (2|two).*"));
+    }
+    @Test
     public void testSearchContainsPaperback(){
 
         String[] lineItems = sections.get(0).split("\\r?\\n");
@@ -70,7 +75,7 @@ public class SearchAndAddToBasketTests {
 
     }
     @Test
-    public void testSearchContainsPrice(){
+    public void testSearchContainsAnyPrice(){
 
         Predicate<String> poundPriceMatcher = text -> (text.matches(".*£\\d+\\.\\d{2}.*"));
 
@@ -104,10 +109,10 @@ public class SearchAndAddToBasketTests {
         String basket_price = home.getBasketPrice();
 
         //assert prices match
-        Assert.assertTrue(basket_price.equals(price));
+        Assert.assertTrue(basket_price.contains(price));
 
         //assert price from search results matches
-        Assert.assertTrue(basket_price.equals(targetPrice));
+        Assert.assertTrue(basket_price.contains(targetPrice));
 
         //assert only one item in basket
         Assert.assertTrue(home.getNumberOfItemsInCart() == 1);
