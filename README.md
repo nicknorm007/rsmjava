@@ -1,4 +1,4 @@
-# rsmjava
+# selenium tests to test amazon uk site examples
 
 1. FooBar problem in App.java, AppTest
 2. Selenium in rsmselenium.tests - need chromedriver 118 in path
